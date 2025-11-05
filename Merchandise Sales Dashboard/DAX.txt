@@ -1,0 +1,70 @@
+Total Sales = SUM('Data'[Total Sales])
+
+--------------------
+
+Total Sales (% vs Prior Month) = 
+
+VAR _CurrentMonth = [Total Sales]
+VAR _PriorMonth =
+CALCULATE(
+    [Total Sales],
+    DATEADD('Calendar'[Date],-1,MONTH)
+)
+
+VAR _Variance = _CurrentMonth - _PriorMonth
+VAR _VariancePercent =
+DIVIDE(
+    _Variance,
+    _PriorMonth,
+    0
+)
+
+RETURN
+_VariancePercent
+
+----------------------------
+
+
+Total Sales (vs Prior Month) Arrow = 
+VAR _uparrow = UNICHAR(129129)
+VAR _downarrow = UNICHAR(129131)
+VAR _zero = UNICHAR(9632)
+
+VAR _CurrentMonth = [Total Sales]
+VAR _PriorMonth =
+CALCULATE(
+    [Total Sales],
+    DATEADD('Calendar'[Date],-1,MONTH)
+)
+
+VAR _Variance = _CurrentMonth - _PriorMonth
+VAR _VariancePercent =
+DIVIDE(
+    _Variance,
+    _PriorMonth,
+    0
+)
+
+VAR _VarianceArrow =
+IF(
+    ISBLANK([Total Sales]),
+    BLANK(),
+    SWITCH(
+        TRUE(),
+        _Variance > 0, _uparrow & " " & ROUND(_VariancePercent * 100, 1) & "% ",
+        _Variance = 0, _zero & " 0%",
+        _Variance < 0, _downarrow & " " & ROUND(_VariancePercent * 100, 1) & "% " 
+    )
+)
+
+RETURN
+_VarianceArrow
+
+-------------------------
+Total Sales Color = 
+SWITCH(
+    TRUE(),
+    [Total Sales (% vs Prior Month)] < 0, "#A84545", //Red
+    [Total Sales (% vs Prior Month)] = 0, "#707070", //Gray
+    [Total Sales (% vs Prior Month)] > 0, "#038D96" //Green
+)
