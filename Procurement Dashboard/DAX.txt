@@ -1,0 +1,70 @@
+Total Orders (% vs Prior Month) = 
+
+VAR _CurrentMonth = [Total Orders]
+VAR _PriorMonth =
+CALCULATE(
+    [Total Orders],
+    DATEADD('Calendar'[Date],-1,MONTH)
+)
+
+VAR _Variance = _CurrentMonth - _PriorMonth
+VAR _VariancePercent =
+DIVIDE(
+    _Variance,
+    _PriorMonth,
+    0
+)
+
+RETURN
+_VariancePercent
+
+
+----------------
+
+
+Total Orders (vs Prior Month) Arrow = 
+VAR _uparrow = UNICHAR(129129)
+VAR _downarrow = UNICHAR(129131)
+VAR _zero = UNICHAR(9632)
+
+VAR _CurrentMonth = [Total Orders]
+VAR _PriorMonth =
+CALCULATE(
+    [Total Orders],
+    DATEADD('Calendar'[Date],-1,MONTH)
+)
+
+VAR _Variance = _CurrentMonth - _PriorMonth
+VAR _VariancePercent =
+DIVIDE(
+    _Variance,
+    _PriorMonth,
+    0
+)
+
+VAR _VarianceArrow =
+IF(
+    ISBLANK([Total Orders]),
+    BLANK(),
+    SWITCH(
+        TRUE(),
+        _Variance > 0, _uparrow & " " & ROUND(_VariancePercent * 100, 1) & "% ",
+        _Variance = 0, _zero & " 0%",
+        _Variance < 0, _downarrow & " " & ROUND(_VariancePercent * 100, 1) & "% " 
+    )
+)
+
+RETURN
+_VarianceArrow
+
+
+-------------------
+
+
+Total Orders Color = 
+SWITCH(
+    TRUE(),
+    [Total Orders (% vs Prior Month)] < 0, "#dc4441", //Red
+    [Total Orders (% vs Prior Month)] = 0, "#707070", //Gray
+    [Total Orders (% vs Prior Month)] > 0, "#30b173" //Green
+)
